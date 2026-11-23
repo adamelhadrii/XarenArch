@@ -1,36 +1,60 @@
 # XarenArch
 
-XarenArch is my personal Arch Linux-based distro, built and maintained solo as a learning project and daily driver. It's tailored specifically to my own hardware and workflow — not intended as a general-purpose distro for arbitrary machines.
+XarenArch is my own Arch-based Linux distro: a live and installable ISO with [Hyprland](https://hyprland.org/) and a macOS-style desktop ([MacShell](https://github.com/0-ss/MacShell)), my own trimmed kernel, and a graphical installer. I build and maintain it solo as a learning project and as something I actually use.
 
-## ⚠️ Compatibility Notice
+**Latest: [XarenArch V2](https://github.com/adamelhadrii/XarenArch/releases/tag/v2.0.0).** The earlier `v1.0.0-beta` build is marked *(broken)*; use V2.
 
-This ISO is built and tested **only on my own hardware**. There is no guarantee it will boot, install, or run correctly on different CPUs, GPUs, or laptop/desktop configurations. Use on other hardware is at your own risk — expect to troubleshoot driver, firmware, or boot issues yourself if your setup differs from mine.
+## Status
 
-## What's Inside
+V2 boots in QEMU (UEFI), and the custom kernel boots it to a login. Some parts are not tested yet:
 
-- **Base**: Arch Linux
-- **Window Manager**: [Hyprland](https://hyprland.org/) (Wayland)
-- **Dotfiles**: [illogical-impulse](https://github.com/end-4/dots-hyprland) — provides a pre-configured, more user-friendly Hyprland setup out of the box (theming, keybinds, widgets, etc.) instead of a bare Hyprland config
-- **Installer**: Calamares — supports full disk wipe, dual-boot alongside an existing OS, or trying the live environment without installing anything
+- **The installer has not been run end to end.** Installing erases the disk you select. Try it on a virtual disk first.
+- **Real hardware has not been tested yet.** The kernel is set up for my laptop (Wi-Fi, audio, touchpad, suspend, GPU), but none of that is confirmed outside QEMU.
+- This is a personal project. Expect rough edges and no support guarantee.
 
-## Why This Exists
+## What's inside
 
-This started as a way to actually learn how a Linux distro is built and how the pieces fit together — package selection, boot process, installer integration, desktop environment configuration — rather than just installing something premade. It's shaped entirely around my own preferences and hardware, so it's shared publicly mainly for reference and transparency, not as a recommended daily driver for others.
+- **Base:** Arch Linux packages
+- **Kernel:** `linux-xarenarch` 7.3.5, a trimmed build for x86-64-v2 (about 40% smaller modules than the stock kernel). Stock `linux` is kept as a fallback boot entry.
+- **Desktop:** Hyprland 0.57 with MacShell 0.5.3: menu bar, dock, Spotlight, Control Center, lock screen
+- **Apps:** Chromium, Nautilus, foot, fastfetch, cmatrix
+- **Keybind Changer** (`Super+K`): a small app that lists every shortcut and lets you rebind or disable any of them. It validates the config before applying and rolls back on errors.
+- **Install Apps:** a deletable script on the dock that installs Cursor, Discord, Claude Code, Antigravity CLI, opencode and a WhatsApp Web launcher when you run it. Nothing proprietary is bundled in the ISO.
+- **Installer:** [Calamares](https://calamares.io/), with erase-disk or manual partitioning, optional LUKS encryption, zram swap, and GRUB for UEFI and BIOS
+
+Handy keys: `Super+Return` terminal, `Super+Q` close window, `Super+K` Keybind Changer.
+
+## Download and boot
+
+Grab `xarenarch-*-x86_64.iso` and `SHA256SUMS` from the [releases page](https://github.com/adamelhadrii/XarenArch/releases) and check the hash:
+
+```
+sha256sum -c SHA256SUMS
+```
+
+- **Try it in QEMU:** `qemu-system-x86_64 -enable-kvm -m 4G -cpu host -smp 4 -cdrom xarenarch-*-x86_64.iso -boot d` (add OVMF firmware to test UEFI)
+- **USB stick:** write it with any image writer. Double-check the target device first, because writing to the wrong one destroys its data.
+
+The live session logs in automatically as `live` (password `live`, passwordless sudo). Don't expose a live session to a network you don't trust. You need about 4 GB of RAM to be comfortable. Secure Boot is not supported.
 
 ## Installing
 
-Boot the ISO, and from the live environment you can:
-1. **Try it live** — explore without touching your disk
-2. **Full wipe install** — erase the target disk and install XarenArch fresh
-3. **Dual-boot** — install alongside an existing operating system
+Start **Install XarenArch** from the dock. Installing **erases the disk you pick** (or whatever you set up in manual partitioning). There is no dual-boot menu support, so don't use it to add XarenArch alongside another OS.
+
+The installed system boots `linux-xarenarch` by default. That kernel does **not** update through `pacman` yet (there is no hosted repo for it); the stock `linux` entry does. Until that changes, new kernel versions only arrive in new ISO builds.
+
+## Hardware notice
+
+It's built around my own hardware (an Intel laptop with Mediatek Wi-Fi) and virtual machines. It may not work on yours; expect to troubleshoot drivers, firmware or boot issues if your setup differs.
 
 ## Credits
 
-- [Arch Linux](https://archlinux.org/)
+- [Arch Linux](https://archlinux.org/) and its packagers
 - [Hyprland](https://hyprland.org/)
-- [illogical-impulse dotfiles](https://github.com/end-4/dots-hyprland) by end-4
+- [MacShell](https://github.com/0-ss/MacShell) by 0-ss (MIT)
+- [Quickshell](https://quickshell.org/)
 - [Calamares](https://calamares.io/)
 
 ## License
 
-Personal project — no warranty, no guarantee of support. Use at your own risk.
+MIT for this repository (see [LICENSE](LICENSE)). The software on the ISO keeps its own licenses. No warranty.
